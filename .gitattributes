@@ -1,0 +1,5 @@
+# Force LF line endings on shell scripts and Dockerfile so they work
+# inside Linux containers no matter who pushed (Windows or otherwise).
+*.sh text eol=lf
+Dockerfile text eol=lf
+entrypoint.sh text eol=lf
