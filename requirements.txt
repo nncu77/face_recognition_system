@@ -1,0 +1,35 @@
+# Core
+numpy==1.24.3
+opencv-python==4.9.0.80
+Pillow==10.2.0
+
+# Face Recognition (商用 OK — 但請查 InsightFace model_zoo 確認 buffalo_l 訓練資料 license)
+insightface==0.7.3
+onnxruntime==1.17.0
+# 改用 GPU (建議 — 你有 GTX 1650 Ti / CUDA 11.7):
+# onnxruntime-gpu==1.17.0
+
+# MediaPipe for liveness detection
+mediapipe==0.10.9
+
+# Backend
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+pydantic==2.5.3
+pydantic-settings==2.1.0   # config.py 用 BaseSettings 需要這個
+
+# Database
+sqlalchemy==2.0.25
+
+# UI
+streamlit==1.30.0
+streamlit-webrtc==0.47.1
+
+# Utils
+python-dotenv==1.0.0
+loguru==0.7.2
+
+# Test
+pytest==7.4.4
+httpx==0.26.0
