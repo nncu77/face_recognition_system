@@ -1,16 +1,16 @@
-# 🎯 Face Recognition System | 商用級人臉辨識系統
+# 🎯 Face Recognition System | 端到端人臉辨識系統
 
-> 基於 InsightFace + FastAPI 的端到端人臉辨識解決方案,支援活體偵測,可商用授權。
+> 基於 InsightFace + FastAPI 的人臉註冊 / 辨識 / 活體偵測 RESTful 服務 + Streamlit Demo UI。
 
 ## ✨ 功能特色
 
-- 🔍 **高準確率人臉辨識** — ArcFace (InsightFace buffalo_l)，LFW paper 99.8%
+- 🔍 **高準確率人臉辨識** — ArcFace (InsightFace buffalo_l)，LFW paper 99.83%
 - 👁️ **活體偵測** — 透過眨眼 (EAR) 防止照片攻擊
-- 🚀 **即時推論** — 單張影像 < 50ms (GPU)
-- 🌐 **RESTful API** — FastAPI 後端,易於整合
-- 🎨 **網頁介面** — Streamlit 直覺操作
-- 📦 **Docker 化** — 一鍵部署
-- ✅ **商用授權** — 框架皆可商用 (見下方 License 注意)
+- 🚀 **即時推論** — 145ms (GTX 1650 Ti GPU) / 790ms (i7 CPU) ／ 6 張臉同時偵測
+- 🌐 **RESTful API** — FastAPI 後端 + OpenAPI docs，易於整合
+- 🎨 **網頁介面** — Streamlit 5 tabs (辨識 / 註冊 / 活體 / 用戶 / 記錄)
+- 📦 **Docker 化** — Dockerfile 已就位
+- ⚠️ **License**：**框架程式碼 MIT 可商用**；**buffalo_l 預訓練權重 non-commercial research only**（要商用要換資料集 retrain 或向 InsightFace 商授權，詳見下方）
 
 ## 🏗️ 系統架構
 
@@ -108,9 +108,22 @@ GPU 首次 cold inference 約 5.3 秒（cuDNN EXHAUSTIVE conv algo search 找最
 
 支援人臉數：10,000+ 即時比對（cosine 線性掃 O(N)，512-dim embedding）。
 
-## ⚠️ License 注意
+## ⚠️ License 重要說明
 
-- **InsightFace 框架本身**:MIT
-- **buffalo_l 模型權重**:以 InsightFace model_zoo 公佈為準。部分 ArcFace 變體用 Glint360K / MS1M-V2 等資料集,商用前請 confirm 上游 dataset license
-- **MediaPipe**:Apache 2.0 ✅
-- **本專案程式碼**:MIT
+| 元件 | License | 商用可行 |
+|---|---|---|
+| 本專案程式碼 | MIT | ✅ 可商用 |
+| InsightFace **框架程式碼** | MIT | ✅ 可商用 |
+| **InsightFace `buffalo_l` 預訓練權重** | **Non-commercial research only** | ❌ **不可商用** |
+| 訓練資料集 (WebFace600K) | Research only | ❌ |
+| MediaPipe (FaceMesh, 活體偵測用) | Apache 2.0 | ✅ |
+| ONNX Runtime | MIT | ✅ |
+| FastAPI / Streamlit / SQLAlchemy / Pydantic | 各自開源寬鬆 license | ✅ |
+
+InsightFace model_zoo 明確標示：「**ALL models are available for non-commercial research purposes only.**」（[來源](https://github.com/deepinsight/insightface/tree/master/model_zoo)）
+
+### 要走商用，三條路：
+
+1. **跟 InsightFace 團隊商業授權**：他們有付費的 commercial-grade 權重 (contact@insightface.ai)
+2. **用 commercial-OK 資料集自訓**：例如 [VGGFace2](https://www.robots.ox.ac.uk/~vgg/data/vgg_face2/)（學術 + 部分商用）或自建資料集
+3. **換成商用 OK 的開源模型**：例如 [DeepFace](https://github.com/serengil/deepface) 內建的 ArcFace 部分權重，或 [face_recognition (dlib)](https://github.com/ageitgey/face_recognition)（dlib license MIT-like，但精度略低）
