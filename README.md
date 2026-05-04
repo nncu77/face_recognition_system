@@ -50,6 +50,24 @@ streamlit run ui/streamlit_app.py
 
 > 第一次跑 `recognize` 或 `register` 時 InsightFace 會下載 buffalo_l 模型 (~280MB) 到 `models/`,需要網路。
 
+## 🎬 一鍵 Demo（不用相機）
+
+repo 內建 6 張不同人臉的 demo crops（從 `insightface/data/images/t1.jpg` 截出），seed 一次就能立刻測辨識：
+
+```powershell
+# 1. seed: 從 t1.jpg 偵測 6 張臉註冊成 Person 1..6
+python scripts/seed_demo.py --reset
+
+# 2. 啟 API
+uvicorn app.main:app --reload
+
+# 3. (另開終端) 對任一張 crop 跑 recognize
+curl -X POST http://localhost:8000/api/recognize -F "image=@data/demo_crops/person3.jpg"
+# → {"matched": true, "name": "Person 3", "similarity": 0.986, "bbox": [...], "det_score": 0.92}
+```
+
+實測 6/6 全對，similarity 都 > 0.98。`--gpu` 旗標可開啟 GPU 加速。
+
 ## 🚀 GPU 加速（可選）
 
 預設 `USE_GPU=False` 跑 CPU。要啟用 GPU：

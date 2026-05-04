@@ -10,6 +10,8 @@ data/embeddings.db
 data/faces/*
 !data/faces/.gitkeep
 
+# demo_crops/ are committed (small derived from t1.jpg, no privacy issue)
+
 models/*
 !models/.gitkeep
 
