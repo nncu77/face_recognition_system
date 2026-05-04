@@ -27,24 +27,41 @@
 | 人臉偵測/特徵 | InsightFace (buffalo_l) |
 | 活體偵測 | MediaPipe FaceMesh |
 | 後端 | FastAPI + Uvicorn |
-| 前端 | Streamlit |
+| 前端 (主) | **Next.js 14 + TypeScript + Tailwind** (`web/`) |
+| 前端 (Dev tool) | Streamlit (`ui/`，快速 demo 用) |
 | 資料庫 | SQLite |
 | 部署 | Docker |
 
 ## 🚀 快速開始
 
 ```powershell
-# 1. 建立虛擬環境
+# 1. 建立 Python 虛擬環境
 python -m venv venv
 venv\Scripts\activate
 
-# 2. 安裝套件
+# 2. 安裝後端套件
 pip install -r requirements.txt
 
-# 3. 啟動 API
+# 3. 啟動 FastAPI (port 8000)
 uvicorn app.main:app --reload
+```
 
-# 4. 啟動 UI (另開終端)
+### 開 Next.js 前端 (推薦)
+
+```powershell
+# 另開終端
+cd web
+npm install
+npm run dev    # http://localhost:3000
+```
+
+CORS 已在 FastAPI 開好，前端 dev 模式直接呼叫 `http://localhost:8000`。
+要改後端位置：`web/.env.local` 寫 `NEXT_PUBLIC_API_URL=https://your-api.example.com`。
+
+### 或開 Streamlit 介面（內部 demo）
+
+```powershell
+# 另開終端
 streamlit run ui/streamlit_app.py
 ```
 
