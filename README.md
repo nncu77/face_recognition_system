@@ -90,11 +90,23 @@ pytest tests/ -v
 
 Smoke tests 不需要 InsightFace model，純驗證 DB / utils / EAR 算式。
 
-## 📊 效能數據 (待量測)
+## 📊 效能數據
 
-- 辨識準確率:99.2% (paper 數字, 實機測試補上)
-- 推論延遲:35ms (GPU) / 180ms (CPU)
-- 支援人臉數:10,000+ 即時比對 (cosine 線性掃)
+實測環境：i7 + 32GB RAM + NVIDIA GeForce GTX 1650 Ti / 4GB VRAM (Turing, 1024 CUDA cores) + CUDA 11.7 + cuDNN 8.9.7 + onnxruntime-gpu 1.15.1
+
+測試圖：`insightface/data/images/t1.jpg` (1280×886, 6 faces)
+
+| 模式 | 純推論 (Python timing) | API 端到端 (curl POST /api/recognize) |
+|---|---|---|
+| **CPU** | 790ms | 817ms median (5 runs: 798-887ms) |
+| **GPU** | 145ms | 165ms median (10 runs: 161-184ms) |
+| **加速** | **5.4×** | **4.95×** |
+
+GPU 首次 cold inference 約 5.3 秒（cuDNN EXHAUSTIVE conv algo search 找最快 kernel，之後 cache）。Init 時間 GPU 約 2.7s vs CPU 1.1s。
+
+辨識準確率（待量測 — paper 報告 buffalo_l 在 LFW 99.83%、ArcFace + ResNet50 backbone）。
+
+支援人臉數：10,000+ 即時比對（cosine 線性掃 O(N)，512-dim embedding）。
 
 ## ⚠️ License 注意
 
