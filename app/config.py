@@ -1,9 +1,11 @@
 """專案設定檔"""
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
     BASE_DIR: Path = Path(__file__).parent.parent
     DATA_DIR: Path = BASE_DIR / "data"
     FACES_DIR: Path = DATA_DIR / "faces"
@@ -22,9 +24,6 @@ class Settings(BaseSettings):
     # API
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
-
-    class Config:
-        env_file = ".env"
 
 
 settings = Settings()

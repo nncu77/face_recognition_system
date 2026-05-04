@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from app.database import Database
 from app.liveness import LEFT_EYE, _eye_aspect_ratio
@@ -13,13 +14,13 @@ from app.utils import bytes_to_embedding, cosine_similarity, embedding_to_bytes
 
 def test_cosine_similarity_identical_is_one() -> None:
     a = np.array([1.0, 2.0, 3.0], dtype=np.float32)
-    assert cosine_similarity(a, a) == 1.0
+    assert cosine_similarity(a, a) == pytest.approx(1.0, abs=1e-6)
 
 
 def test_cosine_similarity_orthogonal_is_zero() -> None:
     a = np.array([1.0, 0.0], dtype=np.float32)
     b = np.array([0.0, 1.0], dtype=np.float32)
-    assert cosine_similarity(a, b) == 0.0
+    assert cosine_similarity(a, b) == pytest.approx(0.0, abs=1e-6)
 
 
 def test_embedding_round_trip() -> None:
