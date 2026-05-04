@@ -18,7 +18,10 @@ class Settings(BaseSettings):
     RECOGNITION_THRESHOLD: float = 0.4   # 餘弦相似度
 
     # 活體偵測
-    LIVENESS_BLINK_THRESHOLD: float = 0.25
+    # EAR 閾值：< 此值視為閉眼。原始 paper 用 0.25 (Western faces)，
+    # 亞洲人睜眼 EAR 常落 0.20-0.28 → 0.25 太高永遠 trigger 不到。
+    # 0.22 對 Asian / 一般 webcam 較合理；可依個人臉形 / 相機距離微調。
+    LIVENESS_BLINK_THRESHOLD: float = 0.22
     LIVENESS_REQUIRED_BLINKS: int = 2
 
     # 推論裝置 — True 試 CUDA 失敗自動 fallback CPU；要實際跑 GPU 需先裝
