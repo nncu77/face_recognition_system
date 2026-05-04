@@ -3,8 +3,10 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # OpenCV / MediaPipe runtime libs
+# (libgl1-mesa-glx was renamed to libgl1 on Debian 12+/trixie; HF Spaces
+# uses trixie under python:3.10-slim so the old name fails to install)
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 \
+    libgl1 libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Python deps (cached layer if requirements.txt unchanged)
