@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from app.config import settings
 from app.database import get_db
 from app.face_engine import get_engine
+from app.liveness import LivenessDetector
 from app.utils import read_image_bytes
 
 
@@ -54,6 +55,15 @@ class LogEntry(BaseModel):
     similarity: float
     timestamp: str
     is_live: bool
+
+
+class LivenessResponse(BaseModel):
+    is_live: bool
+    blink_count: int
+    required_blinks: int
+    frames_processed: int
+    frames_with_face: int
+    ear_history: list[float]
 
 
 # ---- endpoints ----
@@ -130,6 +140,33 @@ def delete_user(user_id: str) -> dict:
 @app.get("/api/logs", response_model=list[LogEntry])
 def list_logs(limit: int = 50) -> list[LogEntry]:
     return [LogEntry(**log) for log in get_db().get_recent_logs(limit)]
+
+
+@app.post("/api/liveness", response_model=LivenessResponse)
+async def liveness(frames: list[UploadFile] = File(...)) -> LivenessResponse:
+    """多 frame 上傳 → 連續餵 LivenessDetector → 回傳 final state。
+    Client 收 ~30 frames 過 ~3 秒 (10 FPS)，要求自然眨眼 ≥2 次"""
+    if not frames:
+        raise HTTPException(status_code=400, detail="至少要 1 個 frame")
+
+    detector = LivenessDetector()
+    frames_with_face = 0
+
+    for f in frames:
+        data = await f.read()
+        img = read_image_bytes(data)
+        result = detector.update(img)
+        if result is not None:
+            frames_with_face += 1
+
+    return LivenessResponse(
+        is_live=detector.blink_count >= settings.LIVENESS_REQUIRED_BLINKS,
+        blink_count=detector.blink_count,
+        required_blinks=settings.LIVENESS_REQUIRED_BLINKS,
+        frames_processed=len(frames),
+        frames_with_face=frames_with_face,
+        ear_history=list(detector.ear_history),
+    )
 
 
 if __name__ == "__main__":
