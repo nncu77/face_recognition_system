@@ -50,13 +50,23 @@ streamlit run ui/streamlit_app.py
 
 > 第一次跑 `recognize` 或 `register` 時 InsightFace 會下載 buffalo_l 模型 (~280MB) 到 `models/`,需要網路。
 
-## 🧪 測試
+## 🚀 GPU 加速（可選）
 
-```powershell
-pytest tests/ -v
-```
+預設 `USE_GPU=False` 跑 CPU。要啟用 GPU：
 
-Smoke tests 不需要 InsightFace model，純驗證 DB / utils / EAR 算式。
+1. **裝 CUDA Toolkit + cuDNN**（onnxruntime-gpu 不內建）
+   - CUDA 11.7 → cuDNN 8.5+
+   - 從 NVIDIA 開發者帳號下載 cuDNN
+2. **換 onnxruntime-gpu**
+   ```powershell
+   pip uninstall onnxruntime
+   pip install onnxruntime-gpu==1.15.1   # CUDA 11.7
+   # or onnxruntime-gpu==1.17.0           # CUDA 11.8
+   ```
+3. **開 USE_GPU**：寫進 `.env` 或設 env `USE_GPU=true`
+
+CUDA DLL 找不到時會自動 fallback CPU，不會 crash。
+看 log 第 2 行 `(active providers: ...)` 確認實際跑哪個。
 
 ## 📡 API
 
@@ -65,11 +75,20 @@ Smoke tests 不需要 InsightFace model，純驗證 DB / utils / EAR 算式。
 | GET | `/` | 服務健康檢查 |
 | POST | `/api/register` | multipart: `name` + `image` |
 | POST | `/api/recognize` | multipart: `image` (+ optional `is_live`) |
+| POST | `/api/liveness` | multipart: `frames` (≥5 張連拍) → blink 偵測 |
 | GET | `/api/users` | 列出全部用戶 |
 | DELETE | `/api/users/{user_id}` | 刪除用戶 |
 | GET | `/api/logs?limit=50` | 最近辨識記錄 |
 
 互動式 docs: http://localhost:8000/docs
+
+## 🧪 測試
+
+```powershell
+pytest tests/ -v
+```
+
+Smoke tests 不需要 InsightFace model，純驗證 DB / utils / EAR 算式。
 
 ## 📊 效能數據 (待量測)
 

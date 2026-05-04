@@ -14,14 +14,25 @@ from app.utils import cosine_similarity
 
 class FaceEngine:
     def __init__(self) -> None:
-        logger.info(f"Loading InsightFace model: {settings.FACE_MODEL_NAME}")
+        providers = (
+            ["CUDAExecutionProvider", "CPUExecutionProvider"]
+            if settings.USE_GPU
+            else ["CPUExecutionProvider"]
+        )
+        logger.info(
+            f"Loading InsightFace model: {settings.FACE_MODEL_NAME} "
+            f"(providers={providers})"
+        )
         self.app = FaceAnalysis(
             name=settings.FACE_MODEL_NAME,
             root=str(settings.MODELS_DIR),
-            providers=["CPUExecutionProvider"],
+            providers=providers,
         )
+        # ctx_id: 0 = first CUDA device (if available), -1 = CPU
+        # When CUDA fails, ORT auto-falls back to CPU regardless of ctx_id.
         self.app.prepare(ctx_id=0, det_thresh=settings.DETECTION_THRESHOLD)
-        logger.info("InsightFace ready")
+        actual = self.app.models["detection"].session.get_providers()
+        logger.info(f"InsightFace ready (active providers: {actual})")
 
     def detect(self, image_bgr: np.ndarray) -> list:
         """回傳所有偵測到的 Face 物件 (含 bbox + embedding)"""

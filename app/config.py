@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     LIVENESS_BLINK_THRESHOLD: float = 0.25
     LIVENESS_REQUIRED_BLINKS: int = 2
 
+    # 推論裝置 — True 試 CUDA 失敗自動 fallback CPU；要實際跑 GPU 需先裝
+    # CUDA Toolkit 11.7+ 與 cuDNN 8.x（onnxruntime-gpu 不內建這兩個）
+    USE_GPU: bool = False
+
     # API
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000

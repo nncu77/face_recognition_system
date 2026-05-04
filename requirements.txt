@@ -6,8 +6,12 @@ Pillow==10.2.0
 # Face Recognition (商用 OK — 但請查 InsightFace model_zoo 確認 buffalo_l 訓練資料 license)
 insightface==0.7.3
 onnxruntime==1.17.0
-# 改用 GPU (建議 — 你有 GTX 1650 Ti / CUDA 11.7):
-# onnxruntime-gpu==1.17.0
+# GPU 路線（要先裝 CUDA Toolkit 11.7 + cuDNN 8.x，onnxruntime-gpu 不內建這兩個）:
+#   1. uninstall onnxruntime
+#   2. CUDA 11.7 → pip install onnxruntime-gpu==1.15.1
+#      CUDA 11.8 → pip install onnxruntime-gpu==1.17.0
+#   3. settings.USE_GPU=True (or env USE_GPU=true)
+# 即使 CUDA DLL 找不到也會 fallback CPU，不會炸
 
 # MediaPipe for liveness detection
 mediapipe==0.10.9
