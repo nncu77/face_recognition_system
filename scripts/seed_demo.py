@@ -23,10 +23,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import cv2
+import insightface
 
+# Cross-platform path to insightface's bundled t1.jpg (works in venv on
+# Windows, system Python in Linux Docker, etc).
 DEFAULT_IMAGE = (
-    Path(__file__).resolve().parents[1]
-    / "venv" / "Lib" / "site-packages" / "insightface" / "data" / "images" / "t1.jpg"
+    Path(insightface.__file__).parent / "data" / "images" / "t1.jpg"
 )
 
 

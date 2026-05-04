@@ -1,3 +1,15 @@
+---
+title: Face Recognition System
+emoji: 👤
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+license: mit
+short_description: InsightFace + FastAPI 端到端人臉辨識（後端），前端在 Vercel
+---
+
 # 🎯 Face Recognition System | 端到端人臉辨識系統
 
 > 基於 InsightFace + FastAPI 的人臉註冊 / 辨識 / 活體偵測 RESTful 服務 + Streamlit Demo UI。

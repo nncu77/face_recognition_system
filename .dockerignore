@@ -1,0 +1,30 @@
+# Skip the Python venv (we install fresh in the image)
+venv/
+.venv/
+
+# Frontend lives separately on Vercel
+web/
+
+# Don't ship dev runtime state
+data/embeddings.db
+data/faces/*
+
+# Pre-fetched buffalo_l (Dockerfile re-fetches in build)
+models/
+
+# Misc dev junk
+.git/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+
+# Streamlit dev tool — not deployed via Docker
+ui/
+
+# Tests not needed in production image
+tests/
