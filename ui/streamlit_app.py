@@ -50,16 +50,23 @@ with tab1:
     if photo is not None:
         img = read_image_bytes(photo.getvalue())
         with st.spinner("比對中..."):
-            user_id, score = engine.recognize(img, db)
-            db.log_recognition(user_id, score, is_live=False)
+            result = engine.recognize(img, db)
+            db.log_recognition(result["user_id"], result["similarity"], is_live=False)
 
-        if user_id:
-            user = db.get_user(user_id)
+        score = result["similarity"]
+        if result["user_id"]:
+            user = db.get_user(result["user_id"])
             st.success(
                 f"✅ 比對成功:**{user['name']}** (similarity = {score:.3f})"
             )
         else:
             st.warning(f"❌ 找不到匹配的人臉 (best similarity = {score:.3f})")
+
+        if result["bbox"]:
+            x1, y1, x2, y2 = result["bbox"]
+            st.caption(
+                f"📍 bbox: ({x1}, {y1})–({x2}, {y2}) · det_score: {result['det_score']:.3f}"
+            )
 
 
 # ---- tab2: register ----

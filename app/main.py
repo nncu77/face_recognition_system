@@ -41,6 +41,8 @@ class RecognizeResponse(BaseModel):
     name: Optional[str]
     similarity: float
     is_live: bool
+    bbox: Optional[list[int]]   # [x1, y1, x2, y2]
+    det_score: float            # detector confidence for the chosen face
 
 
 class UserInfo(BaseModel):
@@ -104,20 +106,23 @@ async def recognize(
 
     engine = get_engine()
     db = get_db()
-    user_id, score = engine.recognize(img, db)
+    result = engine.recognize(img, db)
+    user_id = result["user_id"]
 
     name: Optional[str] = None
     if user_id:
         u = db.get_user(user_id)
         name = u["name"] if u else None
 
-    db.log_recognition(user_id, score, is_live)
+    db.log_recognition(user_id, result["similarity"], is_live)
     return RecognizeResponse(
         matched=user_id is not None,
         user_id=user_id,
         name=name,
-        similarity=float(score),
+        similarity=result["similarity"],
         is_live=is_live,
+        bbox=result["bbox"],
+        det_score=result["det_score"],
     )
 
 

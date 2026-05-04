@@ -38,38 +38,49 @@ class FaceEngine:
         """回傳所有偵測到的 Face 物件 (含 bbox + embedding)"""
         return self.app.get(image_bgr)
 
-    def get_embedding(self, image_bgr: np.ndarray) -> Optional[np.ndarray]:
-        """取最大那張臉的 embedding (註冊用)"""
+    def _largest_face(self, image_bgr: np.ndarray):
+        """從所有偵測到的臉選 bbox 面積最大的"""
         faces = self.detect(image_bgr)
         if not faces:
             return None
-        # 選最大那張臉 (按 bbox 面積)
-        face = max(
+        return max(
             faces,
             key=lambda f: (f.bbox[2] - f.bbox[0]) * (f.bbox[3] - f.bbox[1]),
         )
-        return face.normed_embedding.astype(np.float32)
 
-    def recognize(
-        self, image_bgr: np.ndarray, db: Database
-    ) -> tuple[Optional[str], float]:
-        """1:N 比對，回傳 (user_id, similarity) 或 (None, best_score)"""
-        emb = self.get_embedding(image_bgr)
-        if emb is None:
-            return None, 0.0
+    def get_embedding(self, image_bgr: np.ndarray) -> Optional[np.ndarray]:
+        """取最大那張臉的 embedding (註冊用)"""
+        face = self._largest_face(image_bgr)
+        return None if face is None else face.normed_embedding.astype(np.float32)
+
+    def recognize(self, image_bgr: np.ndarray, db: Database) -> dict:
+        """1:N 比對。回傳 dict:
+        {user_id, similarity, bbox=[x1,y1,x2,y2]|None, det_score}
+        user_id 為 None 表示沒臉或低於 RECOGNITION_THRESHOLD。
+        """
+        face = self._largest_face(image_bgr)
+        if face is None:
+            return {"user_id": None, "similarity": 0.0, "bbox": None, "det_score": 0.0}
+
+        emb = face.normed_embedding.astype(np.float32)
+        bbox = [int(v) for v in face.bbox]
+        det_score = float(face.det_score)
 
         best_match: Optional[str] = None
         best_score = -1.0
-
         for user in db.get_all_users():
             score = cosine_similarity(emb, user["embedding"])
             if score > best_score:
                 best_score = score
                 best_match = user["user_id"]
 
-        if best_score >= settings.RECOGNITION_THRESHOLD:
-            return best_match, best_score
-        return None, best_score
+        matched = best_match if best_score >= settings.RECOGNITION_THRESHOLD else None
+        return {
+            "user_id": matched,
+            "similarity": float(best_score),
+            "bbox": bbox,
+            "det_score": det_score,
+        }
 
 
 _engine: Optional[FaceEngine] = None
