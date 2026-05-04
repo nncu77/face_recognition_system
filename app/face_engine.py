@@ -1,15 +1,50 @@
 """人臉辨識核心 — InsightFace 包裝"""
 from __future__ import annotations
 
+import glob
+import os
+import sys
 from typing import Optional
 
-import numpy as np
-from insightface.app import FaceAnalysis
-from loguru import logger
-
 from app.config import settings
-from app.database import Database
-from app.utils import cosine_similarity
+
+
+def _ensure_cuda_on_path() -> Optional[str]:
+    """Windows: 把 CUDA bin 加進 PATH 才能讓 onnxruntime-gpu 找到
+    cudart64_*.dll / cudnn*.dll。優先用 CUDA_PATH，fallback 找
+    `C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.*`
+    最新版。回傳實際加入的 bin path（或 None 表示沒找到）。"""
+    if sys.platform != "win32":
+        return None
+    cuda_root = os.environ.get("CUDA_PATH")
+    if not cuda_root or not os.path.isdir(cuda_root):
+        candidates = sorted(
+            glob.glob(r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.*")
+        )
+        cuda_root = candidates[-1] if candidates else None
+    if not cuda_root:
+        return None
+    cuda_bin = os.path.join(cuda_root, "bin")
+    if not os.path.isdir(cuda_bin):
+        return None
+    if cuda_bin not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = cuda_bin + os.pathsep + os.environ.get("PATH", "")
+    return cuda_bin
+
+
+# Must run BEFORE the onnxruntime/insightface imports below — otherwise
+# onnxruntime_providers_cuda.dll fails to load its dependencies.
+_cuda_bin_added = _ensure_cuda_on_path() if settings.USE_GPU else None
+
+import numpy as np  # noqa: E402
+from insightface.app import FaceAnalysis  # noqa: E402
+from loguru import logger  # noqa: E402
+
+from app.database import Database  # noqa: E402
+from app.utils import cosine_similarity  # noqa: E402
+
+if _cuda_bin_added:
+    logger.info(f"Added CUDA bin to PATH: {_cuda_bin_added}")
 
 
 class FaceEngine:
