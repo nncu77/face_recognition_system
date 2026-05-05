@@ -12,7 +12,21 @@ short_description: InsightFace + FastAPI 端到端人臉辨識（後端），前
 
 # 🎯 Face Recognition System | 端到端人臉辨識系統
 
-> 基於 InsightFace + FastAPI 的人臉註冊 / 辨識 / 活體偵測 RESTful 服務 + Streamlit Demo UI。
+> 基於 InsightFace + FastAPI 的人臉註冊 / 辨識 / 活體偵測 RESTful 服務 + Next.js 前端。
+
+## 🚀 Live Demo
+
+[![Frontend](https://img.shields.io/badge/Frontend-web--six--zeta--85.vercel.app-black?logo=vercel)](https://web-six-zeta-85.vercel.app)
+[![Backend API](https://img.shields.io/badge/API-lilann--face--recognition--system.hf.space-yellow?logo=huggingface)](https://lilann-face-recognition-system.hf.space)
+[![API Docs](https://img.shields.io/badge/Docs-OpenAPI%2FSwagger-blue)](https://lilann-face-recognition-system.hf.space/docs)
+
+| 試這個 | 連結 |
+|---|---|
+| 🌐 **網頁前端**（Vercel） | <https://web-six-zeta-85.vercel.app> |
+| 🔌 **後端 API**（HF Spaces Docker） | <https://lilann-face-recognition-system.hf.space> |
+| 📚 **互動式 API 文件** | <https://lilann-face-recognition-system.hf.space/docs> |
+
+> ⏰ 後端閒置會 sleep（HF Spaces 免費 tier）。第一次按可能要等 ~30 秒讓 280MB ArcFace 模型載入；之後 ~800ms / inference。
 
 ## ✨ 功能特色
 
