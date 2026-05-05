@@ -70,6 +70,28 @@ class LivenessResponse(BaseModel):
 
 # ---- endpoints ----
 
+@app.get("/api/health")
+def health() -> dict:
+    """Lightweight health probe — no model load, no DB hit. Useful for
+    uptime checks / load balancer probes / smoke testing a redeploy
+    without paying the FaceEngine init cost."""
+    db = get_db()
+    user_count = len(db.get_all_users())
+    return {
+        "status": "ok",
+        "engine_loaded": _engine_initialized(),
+        "user_count": user_count,
+        "model": settings.FACE_MODEL_NAME,
+        "use_gpu": settings.USE_GPU,
+    }
+
+
+def _engine_initialized() -> bool:
+    """Peek at the FaceEngine singleton WITHOUT triggering its lazy load."""
+    from app import face_engine as _fe
+    return _fe._engine is not None
+
+
 @app.get("/")
 def root() -> dict:
     return {
